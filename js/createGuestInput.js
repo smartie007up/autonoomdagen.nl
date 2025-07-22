@@ -44,7 +44,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const naamInput = createInput("text", `${prefix}-naam-${index}`, "Naam");
     naamInput.maxLength = 70; // Set your desired max length
-    naamInput.required = true;
     guestDiv.appendChild(naamInput);
 
     const telInput = createInput("text", `${prefix}-tel-${index}`, "Tel");
@@ -87,10 +86,10 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Validation functions
-  // const validateName = (value) => /^[A-Za-zÀ-ÿ\s]{1,70}$/.test(value);
-  // const validateTel = (value) => /^[+\d]*$/.test(value);
-  // const validateGender = (value) => ["man", "vrouw", "anders"].includes(value);
-  // const validateDieet = (value) => /^[A-Za-z.\s]{0,200}$/.test(value);
+  const validateName = (value) => /^[A-Za-zÀ-ÿ\s]{1,70}$/.test(value);
+  const validateTel = (value) => /^[+\d]*$/.test(value);
+  const validateGender = (value) => ["man", "vrouw", "anders"].includes(value);
+  const validateDieet = (value) => /^[A-Za-z.\s]{0,200}$/.test(value);
 
   const validateGuestFields = (prefix, count) => {
     let allValid = true;
