@@ -1,10 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
   const selectTickets = document.getElementById("select-tickets");
-  const guestBlock = document.querySelector(".guest-block");
   const guestWrapper = document.querySelector(".guest-wrapper");
 
   const selectTicketsCompany = document.getElementById("select-tickets-company");
-  const guestBlockCompany = document.querySelector(".guest-block-company");
   const guestWrapperCompany = document.querySelector(".guest-wrapper-company");
 
   const createInput = (type, id, placeholder = "") => {
@@ -35,6 +33,9 @@ document.addEventListener("DOMContentLoaded", () => {
     return input;
   };
 
+  /*
+  Create a guest block with a name, number, gender and diet.
+  */
   const createGuestBlock = (index, prefix = "guest") => {
     const guestDiv = document.createElement("div");
     guestDiv.className = "guest";
@@ -42,6 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const naamInput = createInput("text", `${prefix}-naam-${index}`, "Naam");
     naamInput.maxLength = 70; // Set your desired max length
+    naamInput.required = true;
     guestDiv.appendChild(naamInput);
 
     const telInput = createInput("text", `${prefix}-tel-${index}`, "Tel");
@@ -57,7 +59,10 @@ document.addEventListener("DOMContentLoaded", () => {
     return guestDiv;
   };
 
-  const updateGuestFields = (ticketCount, block, wrapper, prefix, offset = 1) => {
+  /*
+  Show or hide the guest fields depending on how many tickets are selected
+  */
+  const updateGuestFields = (ticketCount, wrapper, prefix, offset = 1) => {
     const guestCount = Math.max(0, ticketCount - offset);
     //block.style.display = guestCount > 0 ? "block" : "none";
     wrapper.style.display = guestCount > 0 ? "block" : "none";
@@ -70,13 +75,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const handleRegularGuests = () => {
     const ticketCount = parseInt(selectTickets.value, 10) || 1;
-    updateGuestFields(ticketCount, guestBlock, guestWrapper, "guest", 1);
+    updateGuestFields(ticketCount, guestWrapper, "guest", 1);
     bindValidationToAllGuestInputs(); // ✅ bind after dynamic fields created
   };
 
   const handleCompanyGuests = () => {
     const ticketCount = parseInt(selectTicketsCompany.value, 10) || 0;
-    updateGuestFields(ticketCount, guestBlockCompany, guestWrapperCompany, "guest-company", 0);
+    updateGuestFields(ticketCount, guestWrapperCompany, "guest-company", 0);
     bindValidationToAllGuestInputs(); // ✅ bind after dynamic fields created
   };
 
