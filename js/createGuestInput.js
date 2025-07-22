@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const selectTickets = document.getElementById("select-tickets");
   const guestBlock = document.querySelector(".guest-block");
+  console.log("guest block regular = ", guestBlock);
   const guestWrapper = document.querySelector(".guest-wrapper");
 
   const selectTicketsCompany = document.getElementById("select-tickets-company");
@@ -8,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const guestWrapperCompany = document.querySelector(".guest-wrapper-company");
 
   const createInput = (type, id, placeholder = "") => {
+    console.log("INPUT CREATED");
     const input = document.createElement(type === "select" ? "select" : "input");
 
     if (type !== "select") {
@@ -69,12 +71,14 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const handleRegularGuests = () => {
+    console.log("REGULAR GUEST HANDLED");
     const ticketCount = parseInt(selectTickets.value, 10) || 1;
     updateGuestFields(ticketCount, guestBlock, guestWrapper, "guest", 1);
     bindValidationToAllGuestInputs(); // ✅ bind after dynamic fields created
   };
 
   const handleCompanyGuests = () => {
+    console.log("COMPANY GUEST HANDLED");
     const ticketCount = parseInt(selectTicketsCompany.value, 10) || 0;
     updateGuestFields(ticketCount, guestBlockCompany, guestWrapperCompany, "guest-company", 0);
     bindValidationToAllGuestInputs(); // ✅ bind after dynamic fields created
