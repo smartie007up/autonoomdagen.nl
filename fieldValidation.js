@@ -16,8 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
       pattern: /^[\d+\s()-]{6,}$/,
       errorMsg: "Voer een geldig telefoonnummer in.",
       blurOnly: true
-    },
-    
+    },    
     diet: {
       pattern: /^[A-Za-zÀ-ÿ\s.!]*$/,
       errorMsg: "Gebruik alleen normale tekens voor dieetwensen."
@@ -140,13 +139,11 @@ document.addEventListener("DOMContentLoaded", () => {
     { selector: "#lastname", rule: validationRules.name },
     { selector: "#email", rule: validationRules.email },
     { selector: "#telephonenumber", rule: validationRules.tel },
-  //  { selector: "#diet", rule: validationRules.diet },
     { selector: "#company_name", rule: validationRules.company },
 		{ selector: "#street1", rule: validationRules.street },
     { selector: "#postalcode1", rule: validationRules.postalcode },
     { selector: "#location1", rule: validationRules.location },
     { selector: "#country1", rule: validationRules.country },
-
 
     // Company form
     { selector: "#Contactpersoon-bedrijfsnaam", rule: validationRules.company },
@@ -176,13 +173,13 @@ document.addEventListener("DOMContentLoaded", () => {
     ];
 
     guestFieldDefs.forEach(({ prefix, rule }) => {
-			document.querySelectorAll(`input[id^='${prefix}']`).forEach(input => {
-        bindValidation(input, rule, "end");
-      });     
-		});
-	}
+	document.querySelectorAll(`input[id^='${prefix}']`).forEach(input => {
+        	bindValidation(input, rule, "end");
+	});     
+     });
+   }
 
-    // ✅ Expose functions to window for external use
+    // Expose functions to window for external use
     window.validationRules = validationRules;
     window.bindValidation = bindValidation;
     window.bindValidationToAllGuestInputs = bindValidationToAllGuestInputs;
