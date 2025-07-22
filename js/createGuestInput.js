@@ -44,6 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const naamInput = createInput("text", `${prefix}-naam-${index}`, "Naam");
     naamInput.maxLength = 70; // Set your desired max length
+    naamInput.required = true;
     guestDiv.appendChild(naamInput);
 
     const telInput = createInput("text", `${prefix}-tel-${index}`, "Tel");
@@ -62,7 +63,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const updateGuestFields = (ticketCount, block, wrapper, prefix, offset = 1) => {
     const guestCount = Math.max(0, ticketCount - offset);
     block.style.display = guestCount > 0 ? "block" : "none";
-    //wrapper.style.display = guestCount > 0 ? "block" : "none";
     wrapper.innerHTML = "";
 
     for (let i = 1; i <= guestCount; i++) {
