@@ -37,6 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
   Create a guest block with a name, number, gender and diet.
   */
   const createGuestBlock = (index, prefix = "guest") => {
+    console.log("GUEST BLOKC RRWAIBGS");
     const guestDiv = document.createElement("div");
     guestDiv.className = "guest";
     guestDiv.id = `${prefix}-${index}`;
@@ -86,10 +87,10 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Validation functions
-  const validateName = (value) => /^[A-Za-zÀ-ÿ\s]{1,70}$/.test(value);
-  const validateTel = (value) => /^[+\d]*$/.test(value);
-  const validateGender = (value) => ["man", "vrouw", "anders"].includes(value);
-  const validateDieet = (value) => /^[A-Za-z.\s]{0,200}$/.test(value);
+  // const validateName = (value) => /^[A-Za-zÀ-ÿ\s]{1,70}$/.test(value);
+  // const validateTel = (value) => /^[+\d]*$/.test(value);
+  // const validateGender = (value) => ["man", "vrouw", "anders"].includes(value);
+  // const validateDieet = (value) => /^[A-Za-z.\s]{0,200}$/.test(value);
 
   const validateGuestFields = (prefix, count) => {
     let allValid = true;
