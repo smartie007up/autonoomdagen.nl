@@ -59,8 +59,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const updateGuestFields = (ticketCount, block, wrapper, prefix, offset = 1) => {
     const guestCount = Math.max(0, ticketCount - offset);
-    //block.style.display = guestCount > 0 ? "block" : "none";
-    wrapper.style.display = guestCount > 0 ? "block" : "none";
+    block.style.display = guestCount > 0 ? "block" : "none";
+    //wrapper.style.display = guestCount > 0 ? "block" : "none";
     wrapper.innerHTML = "";
 
     for (let i = 1; i <= guestCount; i++) {
