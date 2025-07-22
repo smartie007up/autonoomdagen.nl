@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   /*
-  Show or hide the guest fields depending on how many tickets are selected
+  Show or hide the guest wrapper depending on how many tickets are selected
   */
   const updateGuestFields = (ticketCount, wrapper, prefix, offset = 1) => {
     const guestCount = Math.max(0, ticketCount - offset);
