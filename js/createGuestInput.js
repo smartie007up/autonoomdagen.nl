@@ -54,7 +54,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const dieetInput = createInput("text", `${prefix}-dieet-${index}`, "Allergieën");
     dieetInput.maxLength = 200;
-    dieetInput.required = true;
     guestDiv.appendChild(dieetInput);
 
     return guestDiv;
