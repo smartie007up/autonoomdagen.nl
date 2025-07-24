@@ -1,186 +1,162 @@
-/*
-Code for field validation on Webflow forms
-*/
 document.addEventListener("DOMContentLoaded", () => {
-  const validationRules = {
-    name: {
-      pattern: /^[A-Za-zÀ-ÿ\s'-]+$/,
-      errorMsg: "Gebruik een geldige naam."
-    },
-    email: {
-      pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-      errorMsg: "Voer een geldig e-mailadres in.",
-      blurOnly: true
-    },
-    tel: {
-      pattern: /^[\d+\s()-]{6,}$/,
-      errorMsg: "Voer een geldig telefoonnummer in.",
-      blurOnly: true
-    },    
-    diet: {
-      pattern: /^[A-Za-zÀ-ÿ\s.!]*$/,
-      errorMsg: "Gebruik alleen normale tekens voor dieetwensen."
-    },    
-    company: {
-      pattern: /^[\wÀ-ÿ0-9 '&+.,()\/-]*$/,
-      errorMsg: "Gebruik een geldige bedrijfsnaam."
-    },
-    street: {
-      pattern: /^[A-Za-zÀ-ÿ0-9\s.'\-/,]{2,}$/,
-      errorMsg: "Voer een geldige straatnaam in.",
-      blurOnly: true
-    },
-    postalcode: {
-      pattern: /^([1-9][0-9]{3}\s?[A-Za-z]{2}|[1-9][0-9]{3})$/,
-      errorMsg: "Gebruik een geldige postcode, zoals 1234 AB of 1000.",
-      blurOnly: true
-    },
-    location: {
-      pattern: /^[A-Za-zÀ-ÿ\s.'-]{2,}$/,
-      errorMsg: "Voer een geldige plaatsnaam in.",
-      blurOnly: true
-    },
-    country: {
-      pattern: /^[A-Za-zÀ-ÿ\s.'-]{2,}$/,
-      errorMsg: "Voer een geldig land in.",
-      blurOnly: true
+  const selectTickets = document.getElementById("select-tickets");
+  const guestBlock = document.querySelector(".guest-block");
+  const guestWrapper = document.querySelector(".guest-wrapper");
+
+  const selectTicketsCompany = document.getElementById("select-tickets-company");
+  const guestBlockCompany = document.querySelector(".guest-block-company");
+  const guestWrapperCompany = document.querySelector(".guest-wrapper-company");
+
+  const createInput = (type, id, placeholder = "") => {
+    const input = document.createElement(type === "select" ? "select" : "input");
+
+    if (type !== "select") {
+      input.type = type;
+      input.placeholder = placeholder;
+    }
+
+    input.id = id;
+    input.classList.add("w-input", type === "select" ? "guest-select" : "guest-input");
+
+    if (type === "select") {
+      [
+        { value: "", text: "Kies..." },
+        { value: "man", text: "Man" },
+        { value: "vrouw", text: "Vrouw" },
+        { value: "anders", text: "Anders" },
+      ].forEach(({ value, text }) => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = text;
+        input.appendChild(option);
+      });
+    }
+
+    return input;
+  };
+
+  const createGuestBlock = (index, prefix = "guest") => {
+    const guestDiv = document.createElement("div");
+    guestDiv.className = "guest";
+    guestDiv.id = `${prefix}-${index}`;
+
+    const naamInput = createInput("text", `${prefix}-naam-${index}`, "Naam");
+    naamInput.maxLength = 70; // Set your desired max length
+    naamInput.required = true;
+    guestDiv.appendChild(naamInput);
+
+    const telInput = createInput("text", `${prefix}-tel-${index}`, "Tel");
+    telInput.maxLength = 25; // Adjust based on expected phone number length
+    telInput.required = true;
+    guestDiv.appendChild(telInput);
+
+    const genderSelect = createInput("select", `${prefix}-geslacht-${index}`);
+    genderSelect.required = true;
+    guestDiv.appendChild(genderSelect);
+
+    const dieetInput = createInput("text", `${prefix}-dieet-${index}`, "Allergieën");
+    dieetInput.maxLength = 200;
+    guestDiv.appendChild(dieetInput);
+
+    return guestDiv;
+  };
+
+  const updateGuestFields = (ticketCount, block, wrapper, prefix, offset = 1) => {
+    const guestCount = Math.max(0, ticketCount - offset);
+    block.style.display = guestCount > 0 ? "block" : "none";
+    wrapper.innerHTML = "";
+
+    for (let i = 1; i <= guestCount; i++) {
+      wrapper.appendChild(createGuestBlock(i, prefix));
     }
   };
 
-  function showInlineError(el, msg) {
-    const next = el.nextElementSibling;
-    if (next?.classList.contains("loading-message")) next.remove();
+  const handleRegularGuests = () => {
+    const ticketCount = parseInt(selectTickets.value, 10) || 1;
+    updateGuestFields(ticketCount, guestBlock, guestWrapper, "guest", 1);
+    bindValidationToAllGuestInputs(); // ✅ bind after dynamic fields created
+  };
 
-    if (el.value.trim() === "") {
-      el.classList.remove("input-error");
-      return;
-    }
+  const handleCompanyGuests = () => {
+    const ticketCount = parseInt(selectTicketsCompany.value, 10) || 0;
+    updateGuestFields(ticketCount, guestBlockCompany, guestWrapperCompany, "guest-company", 0);
+    bindValidationToAllGuestInputs(); // ✅ bind after dynamic fields created
+  };
 
-    if (!msg) return;
-    const msgEl = document.createElement("div");
-    msgEl.innerText = msg;
-    msgEl.className = "loading-message error-message";
-    el.insertAdjacentElement("afterend", msgEl);
-    el.classList.add("input-error");
-  }
+  // Validation functions
+  const validateName = (value) => /^[A-Za-zÀ-ÿ\s]{1,70}$/.test(value);
+  const validateTel = (value) => /^[+\d]*$/.test(value);
+  const validateGender = (value) => ["man", "vrouw", "anders"].includes(value);
+  const validateDieet = (value) => /^[A-Za-z.\s]{0,200}$/.test(value);
 
-  function showEndError(el, msg) {
-    const form = el.closest('form');
-    if (!form) return;
+  const validateGuestFields = (prefix, count) => {
+    let allValid = true;
 
-    let containerId = "error-container";    
-    if (form.id === "wf-form-Inschrijfformulier") {
-      containerId = "error-container-reg";
-    }
-    const container = document.getElementById(containerId);
-    if (!container) return;
+    for (let i = 1; i <= count; i++) {
+      const naam = document.getElementById(`${prefix}-naam-${i}`);
+      const tel = document.getElementById(`${prefix}-tel-${i}`);
+      const geslacht = document.getElementById(`${prefix}-geslacht-${i}`);
+      const dieet = document.getElementById(`${prefix}-dieet-${i}`);
 
-    removeEndError(el);
-    const errorEl = document.createElement("div");
-    errorEl.className = "loading-message error-message";
-    errorEl.innerText = msg;
-    errorEl.dataset.forInput = el.id || el.name;
-    container.appendChild(errorEl);
-    el.classList.add("input-error");
-  }
+      // Reset styles
+      [naam, tel, geslacht, dieet].forEach((el) => (el.style.borderColor = ""));
 
-
-  function removeInlineError(el, pattern) {
-    const next = el.nextElementSibling;
-   if (next?.classList.contains("loading-message") && (el.value.trim() === "" || pattern.test(el.value.trim()))) {
-      next.remove();
-      el.classList.remove("input-error");
-    } else if (el.value.trim() === "") {
-      el.classList.remove("input-error");
-    }
-  }
-
-  function removeEndError(el) {
-    el.classList.remove("input-error");
-    const form = el.closest("form");
-    if (!form) return;
-    const errors = form.querySelectorAll(".loading-message.error-message");
-    errors.forEach(err => {
-      if (err.dataset.forInput === (el.id || el.name)) {
-        err.remove();
+      if (naam.value.trim() === "" || !validateName(naam.value)) {
+        naam.style.borderColor = "red";
+        allValid = false;
       }
-    });
-  }
-
-  function bindValidation(el, rule, display = "inline") {
-    const show = display === "end" ? showEndError : showInlineError;
-    const remove = display === "end" ? removeEndError : () => removeInlineError(el, rule.pattern);
-
-    const validate = () => {
-      const value = el.value.trim();
-      if (value === "") {
-        remove(el);
-      } else if (!rule.pattern.test(value)) {
-        show(el, rule.errorMsg);
-      } else {
-        remove(el);
+      if (tel.value.trim() === "" || !validateTel(tel.value)) {
+        tel.style.borderColor = "red";
+        allValid = false;
       }
+      if (geslacht.value === "" || !validateGender(geslacht.value)) {
+        geslacht.style.borderColor = "red";
+        allValid = false;
+      }
+      if (dieet && dieet.value.trim() !== "" && !validateDieet(dieet.value)) {
+        dieet.style.borderColor = "red";
+        allValid = false;
+      }
+    }
+
+    return allValid;
+  };
+
+  // Example: You can call this before form submission to validate all guests
+  const validateAllGuests = () => {
+    const regularCount = Math.max(0, (parseInt(selectTickets.value, 10) || 1) - 1);
+    const companyCount = parseInt(selectTicketsCompany.value, 10) || 0;
+
+    const regularValid = validateGuestFields("guest", regularCount);
+    const companyValid = validateGuestFields("guest-company", companyCount);
+
+    return regularValid && companyValid;
+  };
+
+  selectTickets.addEventListener("change", handleRegularGuests);
+  selectTicketsCompany.addEventListener("change", handleCompanyGuests);
+
+  handleRegularGuests();
+
+  handleCompanyGuests();
+
+  // Expose validation to global if needed
+  window.validateAllGuests = validateAllGuests;
+});
+
+function collectGuestData(containerSelector, prefix) {
+  const guestDivs = document.querySelectorAll(`${containerSelector} .guest`);
+  const guests = [];
+
+  guestDivs.forEach((guestDiv, index) => {
+    const guest = {
+      name: document.getElementById(`${prefix}-naam-${index + 1}`)?.value || "",
+      phone: document.getElementById(`${prefix}-tel-${index + 1}`)?.value || "",
+      gender: document.getElementById(`${prefix}-geslacht-${index + 1}`)?.value || "",
+      diet: document.getElementById(`${prefix}-dieet-${index + 1}`)?.value || "",
     };
-
-    if (rule.blurOnly) {
-      el.addEventListener("blur", validate);
-      el.addEventListener("input", () => {
-        if (el.value.trim() === "") remove(el);
-      });
-    } else {
-      el.addEventListener("input", validate);
-    }
-  }
-
-  // Automatically detect what fields to bind by naming pattern or explicit rules
-  const fieldConfig = [
-    // Regular form
-    { selector: "#firstname", rule: validationRules.name },
-    { selector: "#lastname", rule: validationRules.name },
-    { selector: "#email", rule: validationRules.email },
-    { selector: "#telephonenumber", rule: validationRules.tel },
-    { selector: "#company_name", rule: validationRules.company },
-		{ selector: "#street1", rule: validationRules.street },
-    { selector: "#postalcode1", rule: validationRules.postalcode },
-    { selector: "#location1", rule: validationRules.location },
-    { selector: "#country1", rule: validationRules.country },
-
-    // Company form
-    { selector: "#Contactpersoon-bedrijfsnaam", rule: validationRules.company },
-    { selector: "#Contactpersoon-voornaam", rule: validationRules.name },
-    { selector: "#Contactpersoon-achternaam", rule: validationRules.name },
-    { selector: "#Contactpersoon-tel", rule: validationRules.tel },
-    { selector: "#Contactpersoon-mail", rule: validationRules.email },
-		{ selector: "#street", rule: validationRules.street },
-    { selector: "#postalcode", rule: validationRules.postalcode },
-    { selector: "#location", rule: validationRules.location },
-    { selector: "#country", rule: validationRules.country },
-  ];
-
-  fieldConfig.forEach(({ selector, rule }) => {
-    const el = document.querySelector(selector);
-    if (el) bindValidation(el, rule);
+    guests.push(guest);
   });
 
- function bindValidationToAllGuestInputs() {
-    const guestFieldDefs = [
-      { prefix: "guest-naam-", rule: validationRules.name },
-      { prefix: "guest-tel-", rule: validationRules.tel },
-     // { prefix: "guest-dieet-", rule: validationRules.diet },
-      { prefix: "guest-company-naam-", rule: validationRules.name },
-      { prefix: "guest-company-tel-", rule: validationRules.tel },
-     //{ prefix: "guest-company-dieet-", rule: validationRules.diet }
-    ];
-
-    guestFieldDefs.forEach(({ prefix, rule }) => {
-	document.querySelectorAll(`input[id^='${prefix}']`).forEach(input => {
-        	bindValidation(input, rule, "end");
-	});     
-     });
-   }
-
-    // Expose functions to window for external use
-    window.validationRules = validationRules;
-    window.bindValidation = bindValidation;
-    window.bindValidationToAllGuestInputs = bindValidationToAllGuestInputs;
-});
+  return guests;
+}
