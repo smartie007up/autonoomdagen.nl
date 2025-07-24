@@ -50,7 +50,9 @@ document.addEventListener("DOMContentLoaded", () => {
     telInput.required = true;
     guestDiv.appendChild(telInput);
 
-    guestDiv.appendChild(createInput("select", `${prefix}-geslacht-${index}`));
+    const genderSelect = createInput("select", `${prefix}-geslacht-${index}`);
+    genderSelect.required = true;
+    guestDiv.appendChild(genderSelect);
 
     const dieetInput = createInput("text", `${prefix}-dieet-${index}`, "Allergieën");
     dieetInput.maxLength = 200;
