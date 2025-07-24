@@ -137,6 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
   selectTicketsCompany.addEventListener("change", handleCompanyGuests);
 
   handleRegularGuests();
+
   handleCompanyGuests();
 
   // Expose validation to global if needed
